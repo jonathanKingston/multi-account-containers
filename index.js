@@ -2,9 +2,11 @@ const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 /* global require */
 
+const { attachTo } = require("sdk/content/mod");
 const { Cc, Ci, Cu, Cr } = require('chrome');
 const {ContextualIdentityService} = require('resource://gre/modules/ContextualIdentityService.jsm');
 const self = require('sdk/self');
+const { Style } = require("sdk/stylesheet/style");
 const tabs = require('sdk/tabs');
 const tabsUtils = require('sdk/tabs/utils');
 const { viewFor } = require("sdk/view/core");
@@ -295,6 +297,9 @@ let ContainerService =
     });
 
     button.appendChild(popup);
+    let style = Style({ uri: self.data.url("chrome.css") });
+
+    attachTo(style, viewFor(window));
   },
 };
 
