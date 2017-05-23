@@ -107,6 +107,16 @@ const Logic = {
     browser.storage.local.set({browserActionBadgesClicked: storage.browserActionBadgesClicked});
   },
 
+  async identity(cookieStoreId) {
+    const identity = await browser.contextualIdentities.get(cookieStoreId);
+    return identity || {
+      name: "Default",
+      cookieStoreId,
+      icon: "circle",
+      color: "black"
+    };
+  },
+
   addEnterHandler(element, handler) {
     element.addEventListener("click", handler);
     element.addEventListener("keydown", (e) => {
@@ -119,6 +129,14 @@ const Logic = {
   userContextId(cookieStoreId = "") {
     const userContextId = cookieStoreId.replace("firefox-container-", "");
     return (userContextId !== cookieStoreId) ? Number(userContextId) : false;
+  },
+
+  async currentTab() {
+    const activeTabs = await browser.tabs.query({active: true});
+    if (activeTabs.length > 0) {
+      return activeTabs[0]
+    }
+    return false;
   },
 
   refreshIdentities() {
@@ -139,7 +157,7 @@ const Logic = {
     }).catch((e) => {throw e;});
   },
 
-  showPanel(panel, currentIdentity = null) {
+  async showPanel(panel, currentIdentity = null) {
     // Invalid panel... ?!?
     if (!(panel in this._panels)) {
       throw new Error("Something really bad happened. Unknown panel: " + panel);
@@ -151,15 +169,11 @@ const Logic = {
     this._currentIdentity = currentIdentity;
 
     // Initialize the panel before showing it.
-    this._panels[panel].prepare().then(() => {
-      for (let panelElement of document.querySelectorAll(".panel")) { // eslint-disable-line prefer-const
-        panelElement.classList.add("hide");
-      }
-      document.querySelector(this._panels[panel].panelSelector).classList.remove("hide");
-    })
-    .catch(() => {
-      throw new Error("Failed to show panel " + panel);
-    });
+    await this._panels[panel].prepare();
+    for (let panelElement of document.querySelectorAll(".panel")) { // eslint-disable-line prefer-const
+      panelElement.classList.add("hide");
+    }
+    document.querySelector(this._panels[panel].panelSelector).classList.remove("hide");
   },
 
   showPreviousPanel() {
@@ -367,8 +381,29 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
   },
 
   // This method is called when the panel is shown.
-  prepare() {
+  async prepare() {
     const fragment = document.createDocumentFragment();
+
+    const currentTab = await Logic.currentTab();
+    const currentTabElement = document.getElementById("current-tab");
+    currentTabElement.hidden = !!currentTab;
+    if (currentTab) {
+      const identity = await Logic.identity(currentTab.cookieStoreId);
+      const currentPage = document.getElementById("current-page");
+      const favIconUrl = currentTab.favIconUrl || "";
+      currentPage.innerHTML = escaped`
+        <img src="${favIconUrl}" /> ${currentTab.title}
+      `;
+      const currentContainer = document.getElementById("current-container");
+      currentContainer.innerHTML = escaped`
+        <div
+           class="usercontext-icon"
+           data-identity-icon="${identity.icon}"
+           data-identity-color="${identity.color}">
+         </div>
+        ${identity.name}
+      `;
+    }
 
     Logic.identities().forEach(identity => {
       const hasTabs = (identity.hasHiddenTabs || identity.hasOpenTabs);

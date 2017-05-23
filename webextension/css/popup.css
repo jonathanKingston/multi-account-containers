@@ -8,6 +8,10 @@ html {
   box-sizing: border-box;
 }
 
+:root {
+  --font-size-heading: 16px;
+}
+
 *,
 *::before,
 *::after {
@@ -223,7 +227,7 @@ table {
 
 .onboarding-title {
   color: #43484e;
-  font-size: 16px;
+  font-size: var(--font-size-heading);
   margin-block-end: 0;
   margin-block-start: 0;
   margin-inline-end: 0;
@@ -312,7 +316,7 @@ manage things like container crud */
 .panel-header-text {
   color: #4a4a4a;
   flex: 1;
-  font-size: 16px;
+  font-size: var(--font-size-heading);
   font-weight: normal;
   margin-block-end: 0;
   margin-block-start: 0;
@@ -329,6 +333,45 @@ span ~ .panel-header-text {
   padding-block-start: 0;
   padding-inline-end: 0;
   padding-inline-start: 0;
+}
+
+#current-tab {
+  max-inline-size: 100%;
+  padding-block-start: 16px;
+  padding-block-end: 16px;
+  padding-inline-start: 16px;
+}
+
+#current-tab > h3 {
+  color: #4a4a4a;
+  font-size: var(--font-size-heading);
+  font-weight: normal;
+  margin-block-end: 0;
+  margin-block-start: 0;
+}
+
+#current-page {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#current-page > img {
+  block-size: 16px;
+  inline-size: 16px;
+}
+
+#current-tab > label {
+  display: block;
+}
+
+#current-tab > label > input {
+  display: inline;
+}
+#current-tab > label > img {
+  block-size: 12px;
+  display: inline-block;
+  inline-size: 12px;
 }
 
 /* Rows used when iterating over panels */
@@ -528,7 +571,7 @@ span ~ .panel-header-text {
 
 .delete-container-confirm-title {
   color: #000;
-  font-size: 16px;
+  font-size: var(--font-size-heading);
 }
 
 /* Form info */
