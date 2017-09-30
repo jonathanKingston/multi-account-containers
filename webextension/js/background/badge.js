@@ -3,6 +3,13 @@ const badge = {
   async init() {
     const currentWindow = await browser.windows.getCurrent();
     this.displayBrowserActionBadge(currentWindow.incognito);
+
+    const tabs = await browser.tabs.query({});
+    for (let tab of tabs) { // eslint-disable-line prefer-const
+      if (tab.incognito) {
+        this.disableAddon(tab.id);
+      }
+    }
   },
 
   disableAddon(tabId) {
