@@ -88,6 +88,12 @@ const Logic = {
       throw new Error("Failed to retrieve the identities or variation. We cannot continue. ", e.message);
     }
 
+    document.body.addEventListener("mousedown", (e) => {
+      if (e.buttons == 2) {
+        e.preventDefault();
+      }
+    });
+
     // Routing to the correct panel.
     // If localStorage is disabled, we don't show the onboarding.
     const data = await browser.storage.local.get([ONBOARDING_STORAGE_KEY]);
